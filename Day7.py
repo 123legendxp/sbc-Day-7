@@ -1,71 +1,90 @@
-accounts = {}
+import random
 
-def account_exists(user_id):
-    return user_id in accounts
+class Bank:
+    def __init__(self):
+        self.accounts = {}
 
-def create_account(user_id):
-    if account_exists(user_id):
-        print("Account already exists.")
-    else:
-        accounts[user_id] = {'balance': 0}
-        print(f"Account created for user {user_id}")
+    def create_account(self):
+        user_id = random.randint(1000, 9999)
+        pin = int(input("Create your PIN: "))
+        self.accounts[user_id] = {"pin": pin, "balance": 0.0}
+        print("Your account ID is: ", user_id)
 
-def check_balance(user_id):
-    if account_exists(user_id):
-        balance = accounts[user_id]['balance']
-        print(f"Balance for user {user_id}: {balance}")
-    else:
-        print("Account does not exist.")
+    def get_account(self, user_id):
+        return self.accounts.get(user_id)
 
-def deposit(user_id, amount):
-    if account_exists(user_id):
-        accounts[user_id]['balance'] += amount
-        print(f"Deposited {amount} into account of user {user_id}")
-        check_balance(user_id)
-    else:
-        print("Account does not exist.")
-
-def withdraw(user_id, amount):
-    if account_exists(user_id):
-        if accounts[user_id]['balance'] >= amount:
-            accounts[user_id]['balance'] -= amount
-            print(f"Withdrew {amount} from account of user {user_id}")
-            check_balance(user_id)
+    def delete_account(self, user_id):
+        if user_id in self.accounts:
+            del self.accounts[user_id]
         else:
-            print("Insufficient balance.")
-    else:
-        print("Account does not exist.")
+            print("Account not found")
 
-def delete_account(user_id):
-    if account_exists(user_id):
-        del accounts[user_id]
-        print(f"Account of user {user_id} deleted.")
-    else:
-        print("Account does not exist.")
+class Account:
+    def __init__(self, account_data):
+        self.account_data = account_data
 
-while True:
+    def deposit(self, amount):
+        self.account_data["balance"] += amount
+        print("Deposit successful. New balance: ", self.account_data["balance"])
 
-    choice = input("HELLO AKIRES: ")
+    def check_balance(self):
+        print("Your balance: ", self.account_data["balance"])
 
-    if choice == "1":
-        user_id = input("UD: ")
-        create_account(user_id)
-    elif choice == "2":
-        user_id = input("Enter user ID: ")
-        check_balance(user_id)
-    elif choice == "3":
-        user_id = input("Enter user ID: ")
-        amount = float(input("Enter deposit amount: "))
-        deposit(user_id, amount)
-    elif choice == "4":
-        user_id = input("Enter user ID: ")
-        amount = float(input("Enter withdrawal amount: "))
-        withdraw(user_id, amount)
-    elif choice == "5":
-        user_id = input("Enter user ID: ")
-        delete_account(user_id)
-    elif choice == "6":
-        print("Thank you for using Simple Banking System. Goodbye!")
-        break
-    else:
-        print("Invalid choice. Please enter a number between 1 and 6.")
+    def withdraw(self, amount):
+        if amount <= self.account_data["balance"]:
+            self.account_data["balance"] -= amount
+            print("Withdrawal successful. New balance: ", self.account_data["balance"])
+        else:
+            print("Insufficient balance")
+
+def main():
+    bank = Bank()
+    while True:
+        choice = input("Enter your choice:\n1. Create account\n2. Deposit\n3. Check balance\n4. Withdraw\n5. Delete account\n6. Exit\n")
+        if choice == "1":
+            bank.create_account()
+        elif choice == "2":
+            user_id = int(input("Enter your account ID: "))
+            pin = int(input("Enter your PIN: "))
+            account = bank.get_account(user_id)
+            if account and account["pin"] == pin:
+                amount = float(input("Enter amount to deposit: "))
+                account_obj = Account(account)
+                account_obj.deposit(amount)
+            else:
+                print("Invalid PIN or Account not found")
+        elif choice == "3":
+            user_id = int(input("Enter your account ID: "))
+            pin = int(input("Enter your PIN: "))
+            account = bank.get_account(user_id)
+            if account and account["pin"] == pin:
+                account_obj = Account(account)
+                account_obj.check_balance()
+            else:
+                print("Invalid PIN or Account not found")
+        elif choice == "4":
+            user_id = int(input("Enter your account ID: "))
+            pin = int(input("Enter your PIN: "))
+            account = bank.get_account(user_id)
+            if account and account["pin"] == pin:
+                amount = float(input("Enter amount to withdraw: "))
+                account_obj = Account(account)
+                account_obj.withdraw(amount)
+            else:
+                print("Invalid PIN or Account not found")
+        elif choice == "5":
+            user_id = int(input("Enter your account ID: "))
+            pin = int(input("Enter your PIN: "))
+            account = bank.get_account(user_id)
+            if account and account["pin"] == pin:
+                bank.delete_account(user_id)
+            else:
+                print("Invalid PIN or Account not found")
+        elif choice == "6":
+            print("Thank you!")
+            break
+        else:
+            print("Invalid choice. Try again!")
+
+if __name__ == "__main__":
+    main()
